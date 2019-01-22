@@ -1,0 +1,15 @@
+{
+  "name": "shared-masternodes-sm",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "truffle": "node_modules/.bin/truffle",
+    "ganache-cli": "node_modules/.bin/ganache-cli"
+  },
+  "devDependencies": {
+    "ganache-cli": "^6.2.5",
+    "truffle": "4.1.15"
+  },
+  "dependencies": {}
+}
