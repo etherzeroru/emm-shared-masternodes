@@ -111,7 +111,7 @@ contract EmmSharedNodes {
         balance = balances[msg.sender];
     }
 
-    function getBalance(address _address) constant public onlyProcessor returns (uint balance) {
+    function getBalance(address _address) constant public returns (uint balance) {
         balance = balances[_address];
     }
 
