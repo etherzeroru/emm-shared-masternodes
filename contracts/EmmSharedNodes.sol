@@ -190,8 +190,12 @@ contract EmmSharedNodes {
         commissionPercent = _commission;
     }
 
+    function undistributedRewards() public view returns (uint value) {
+        value = address(this).balance - (ownedCoins - usedCoins);
+    }
+
     function distributeRewards() public returns (uint distributed, uint toOwner){
-        uint toDistribute = address(this).balance - (ownedCoins - usedCoins);
+        uint toDistribute = undistributedRewards();
         require(toDistribute > 0);
         require(address(this).balance >= toDistribute);
 
@@ -212,7 +216,7 @@ contract EmmSharedNodes {
     }
 
     function takeAllUndistributed() public onlyOwner returns (uint _distributed){
-        uint toDistribute = address(this).balance - (ownedCoins - usedCoins);
+        uint toDistribute = undistributedRewards();
         require(address(this).balance >= toDistribute);
 
         ownerRewards += toDistribute;
