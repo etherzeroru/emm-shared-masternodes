@@ -137,7 +137,7 @@ contract('Emm Shared Nodes', async (accounts) => {
         let proxy = EmmSharedNodeProxy.at(await emmSharedNodes.nodes(0));
         assert.ok(await proxy.active());
 
-        web3.eth.sendTransaction({
+        emmSharedNodes.addReward({
             from: accounts[5],
             to: emmSharedNodes.address,
             value: web3.toWei(100),
@@ -169,11 +169,9 @@ contract('Emm Shared Nodes', async (accounts) => {
         assert.isNotNull(await emmSharedNodes.nodes(0));
         let proxy = EmmSharedNodeProxy.at(await emmSharedNodes.nodes(0));
         assert.ok(await proxy.active());
-
         assert.ok(balance(emmSharedNodes.address) < 20000, "Shared Nodes Contract balance too big");
         let oldUserBalance = balance(accounts[1]);
-        await emmSharedNodes.withdraw(15000 * 10 ** 18, {from: accounts[1], gasLimit: 270000});
-
+        await emmSharedNodes.withdraw(15000 * 10 ** 18, {from: accounts[1], gasLimit: 2700000});
         assert.ok(!await proxy.active(), "Node should be inactive");
         assert.ok(Math.abs(oldUserBalance + 15000 - balance(accounts[1])) < 0.09, "User balance wrong")
     });

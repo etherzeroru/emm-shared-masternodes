@@ -78,7 +78,19 @@ contract EmmSharedNodes {
     // Coin management
 
     function() payable public {
-        // Here comes mining rewards
+        if (msg.value >= ONE_ETZ) {
+            deposit();
+        } else if (msg.value == 0) {
+            withdraw(0);
+        } else {
+            revert();
+        }
+    }
+
+    function addReward() payable public {
+    }
+
+    function returnCoins() payable public {
     }
 
     function accountsCount() public view returns (uint count) {
@@ -263,7 +275,7 @@ contract EmmSharedNodeProxy {
         require(address(this).balance == 0);
         require(nodesContract.call.value(0)());
         assert(address(this).balance == MASTERNODE_WITHDRAW);
-        owner.transfer(address(this).balance);
+        require(owner.call.value(address(this).balance)(bytes4(keccak256("returnCoins()"))));
         assert(address(this).balance == 0);
         active = false;
     }
