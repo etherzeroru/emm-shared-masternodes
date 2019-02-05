@@ -98,7 +98,7 @@ contract EmmSharedNodes {
     }
 
     function deposit() payable public {
-        require(msg.value > ONE_ETZ);
+        require(msg.value >= ONE_ETZ);
 
         uint len = accounts.length;
         bool exists = false;
