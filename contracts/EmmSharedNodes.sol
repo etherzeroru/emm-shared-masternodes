@@ -63,7 +63,7 @@ contract EmmSharedNodes {
             volume = ownerRewards;
         }
         require(ownerRewards >= volume);
-        require(ownedCoins > volume);
+        require(ownedCoins >= volume);
 
         ownerRewards -= volume;
 
@@ -135,7 +135,7 @@ contract EmmSharedNodes {
         } else {
             volume = balances[msg.sender];
         }
-        require(ownedCoins > volume);
+        require(ownedCoins >= volume);
         balances[msg.sender] -= volume;
 
         uint stoppedNodes = releaseCoins(volume);
