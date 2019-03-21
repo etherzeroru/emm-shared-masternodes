@@ -45,7 +45,7 @@ contract ProposalETZ {
     uint public constant votePeriod       =  1200000; //3600 for test actully 1200000 blocks
     uint public budgetAddedChain = votePeriod * 1125/10000 * 10 ** 18;
     address public owner;
-    address public MasterAddr = 0x000000000000000000000000000000000000000A;//Masternode contract Addr
+    address public MasterAddr;//Masternode contract Addr
     uint public blockStart = block.number;
     uint public blockOrigin = block.number;
     uint public VoteIndex =1;
@@ -63,6 +63,10 @@ contract ProposalETZ {
     //  uint indexed voteNumNo,bool indexed adopted,bool indexed passed,address indexed addr);
     event submit_event(string pname, string plink, uint papplyAmount,address paddr,uint VoteIndex);
     event vote_event(uint pIndex,uint voteNumYes, uint voteNumNo,uint voteNumAct, bool adopted);
+
+    constructor(address _MasterAddr) public {
+        MasterAddr = _MasterAddr;
+    }
 
     function () payable external {
         proposalPay storage pl = proposalsAddr[msg.sender];

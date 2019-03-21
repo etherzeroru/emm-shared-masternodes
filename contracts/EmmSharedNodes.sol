@@ -8,7 +8,7 @@ contract EmmSharedNodes {
     uint public constant MAX_COMMISSION_PERCENT = 50;
     uint public constant ONE_ETZ = 10 ** 18;
 
-    address public nodesContract;
+    address payable public nodesContract;
     address public votingContract;
     address public owner;
     address public processor;
@@ -92,7 +92,7 @@ contract EmmSharedNodes {
 
     // Creating Shared Nodes Managing contract with Masternode Managing contract address (0x000000000000000000000000000000000000000a)
     // and voting contract address (0x4761977f757e3031350612d55bb891c8144a414b)
-    constructor(address _nodesContract, address _votingContract) public {
+    constructor(address payable _nodesContract, address _votingContract) public {
         nodesContract = _nodesContract;
         votingContract = _votingContract;
         owner = msg.sender;
@@ -327,14 +327,14 @@ contract EmmSharedNodeProxy {
     uint public constant MASTERNODE_DEPOSIT = 20000 * 10 ** 18;
     uint public constant MASTERNODE_WITHDRAW = 1999999 * 10 ** 16;
 
-    address nodesContract;
-    address votingContract;
+    address payable public nodesContract;
+    address public votingContract;
     address public owner;
     bool public active = false;
 
     // Creating Shared Nodes Proxy contract with Masternode Managing contract address (0x000000000000000000000000000000000000000a)
     // and voting contract address (0x4761977f757e3031350612d55bb891c8144a414b)
-    constructor(address _nodeContract, address _votingContract) public {
+    constructor(address payable _nodeContract, address _votingContract) public {
         nodesContract = _nodeContract;
         votingContract = _votingContract;
         owner = msg.sender;
@@ -350,10 +350,6 @@ contract EmmSharedNodeProxy {
         // For withdraw coins from Masternode Contract
     }
 
-    function make_payable(address x) internal pure returns (address payable) {
-        return address(uint160(x));
-    }
-
     // Register masternode with masternode data (id1, id2) and send MASTERNODE_DEPOSIT to Masternode Managing Contract
     function register(bytes32 id1, bytes32 id2) payable external onlyOwner {
         require(msg.value == MASTERNODE_DEPOSIT);
@@ -365,20 +361,21 @@ contract EmmSharedNodeProxy {
     }
 
     // Unregister masternode and send MASTERNODE_DEPOSIT from Masternode Managing Contract to Shared Nodes Managing Contract
-    function unregister() external onlyOwner {
+    function unregister() public onlyOwner {
         require(address(this).balance == 0);
-        address payable contr = make_payable(nodesContract);
-        contr.transfer(0);
+        //nodesContract.transfer(0);
+        (bool successWithdraw,) = nodesContract.call(abi.encodeWithSignature("()"));
+        require(successWithdraw);
 
         assert(address(this).balance == MASTERNODE_WITHDRAW);
-        (bool success,) = owner.call.value(address(this).balance)(abi.encodeWithSignature("returnCoins()"));
-        require(success);
+        (bool successReturn,) = owner.call.value(address(this).balance)(abi.encodeWithSignature("returnCoins()"));
+        require(successReturn);
         assert(address(this).balance == 0);
         active = false;
     }
 
     // Vote for proposal (only for owner)
-    function vote(uint index, uint  voteType) external onlyOwner {
+    function vote(uint index, uint  voteType) public onlyOwner {
         (bool success,) = votingContract.call(abi.encodeWithSignature("vote(uint, uint)", index, voteType));
         require(success);
     }
