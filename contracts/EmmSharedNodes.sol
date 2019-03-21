@@ -377,7 +377,7 @@ contract EmmSharedNodeProxy {
     // Vote for proposal (only for owner)
     function vote(uint index, uint  voteType) public onlyOwner {
         (bool success,) = votingContract.call(abi.encodeWithSignature("vote(uint, uint)", index, voteType));
-        // require(success);
+        // require(success); <- illegal voters should be skipped
     }
 
 }
