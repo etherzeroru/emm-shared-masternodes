@@ -42,7 +42,7 @@ contract ProposalETZ {
     }
 
     uint public constant etzPerProposal= 10 * 10 ** 18; //payed for each proposal actully 10ETZ
-    uint public constant votePeriod       =  1200000; //3600 for test actully 1200000 blocks
+    uint public constant votePeriod       =  200; //100 for test actully 1200000 blocks
     uint public budgetAddedChain = votePeriod * 1125/10000 * 10 ** 18;
     address public owner;
     address public MasterAddr;//Masternode contract Addr

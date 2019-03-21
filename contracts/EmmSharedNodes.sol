@@ -314,7 +314,7 @@ contract EmmSharedNodes {
     // Vote for proposal (only for owner)
     function vote(uint index, uint  voteType) external onlyOwner  {
         for (uint i = 0; i < nextInactiveNode; i++) {
-            EmmSharedNodeProxy proxy = nodes[nextInactiveNode];
+            EmmSharedNodeProxy proxy = nodes[i];
             proxy.vote(index, voteType);
         }
     }
@@ -377,7 +377,7 @@ contract EmmSharedNodeProxy {
     // Vote for proposal (only for owner)
     function vote(uint index, uint  voteType) public onlyOwner {
         (bool success,) = votingContract.call(abi.encodeWithSignature("vote(uint, uint)", index, voteType));
-        require(success);
+        // require(success);
     }
 
 }

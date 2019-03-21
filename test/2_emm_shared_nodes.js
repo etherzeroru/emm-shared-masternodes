@@ -221,6 +221,66 @@ contract('Emm Shared Nodes', async (accounts) => {
 
         assert.ok(await proxy.active());
         assert.ok(await secondProxy.active());
+    });
+
+    it ('Setup proposal', async() => {
+
+        let oldCount = (await voting.getProposalsNum()).toString();
+        await voting.proposalSubmit("First one", "This is first proposal!", BigInt(1000000 * 10 ** 18).toString(10), accounts[7], {value: 10 * 10 ** 18});
+        let newCount = (await voting.getProposalsNum()).toString();
+
+        assert.ok( parseInt(newCount) === parseInt(oldCount) + 1, "Proposal count wrong");
+    });
+
+    it ('Try to vote (fail)', async() => {
+        let proposal = await voting.proposals(0);
+        let yesBefore = parseInt(proposal.voteNumYes.toString());
+        let noBefore = parseInt(proposal.voteNumNo.toString());
+
+        await emmSharedNodes.vote(0, 1);
+
+        let proposalAfterFail = await voting.proposals(0);
+        let yesAfterFail = parseInt(proposalAfterFail.voteNumYes.toString());
+        let noAfterFail = parseInt(proposalAfterFail.voteNumNo.toString());
+
+        assert.ok(yesBefore === yesAfterFail, "Yes shouldn't change");
+        assert.ok(noBefore === noAfterFail, "No shouldn't change");
+    });
+
+    it ('Setup another proposal', async() => {
+
+        for (let i = 1; i <= 220; i++) {
+            if (i % 20 === 0) {
+                console.log(i)
+            }
+            await web3.eth.sendTransaction({
+                to: accounts[0],
+                from: accounts[8],
+                value: 1,
+                gasLimit: 270000
+            });
+        }
+
+        let oldCount = (await voting.getProposalsNum()).toString();
+        await voting.proposalSubmit("Second one", "This is second proposal!", BigInt(1000000 * 10 ** 18).toString(10), accounts[7], {value: 10 * 10 ** 18});
+        let newCount = (await voting.getProposalsNum()).toString();
+
+        assert.ok( parseInt(newCount) === parseInt(oldCount) + 1, "Proposal count wrong");
+    });
+
+    it ('Try to vote (success)', async() => {
+        let proposal = await voting.proposals(0);
+        let yesBefore = parseInt(proposal.voteNumYes.toString());
+        let noBefore = parseInt(proposal.voteNumNo.toString());
+
+        await emmSharedNodes.vote(1, 1);
+
+        let proposalAfterFail = await voting.proposals(0);
+        let yesAfterFail = parseInt(proposalAfterFail.voteNumYes.toString());
+        let noAfterFail = parseInt(proposalAfterFail.voteNumNo.toString());
+
+        assert.ok(yesBefore === yesAfterFail, "Yes shouldn't change");
+        assert.ok(noBefore === noAfterFail, "No shouldn't change");
     })
 
 });
