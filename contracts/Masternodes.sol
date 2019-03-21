@@ -1,4 +1,4 @@
-pragma solidity ^0.4.11;
+pragma solidity 0.5.0;
 
 contract Masternode {
 
@@ -49,6 +49,14 @@ contract Masternode {
     event newProposal(address from, address to);
     event governanceAddressChange(address from, address to);
 
+    function make_payable(address x) internal pure returns (address payable) {
+        return address(uint160(x));
+    }
+
+    function to_address(bytes32 data) internal pure returns (address) {
+        return address(uint160(uint256(data)));
+    }
+
     constructor() public {
     }
 
@@ -71,7 +79,7 @@ contract Masternode {
                 revert(0, 0)
             }
         }*/
-        address account = address(output[0]);
+        address account = to_address(output[0]);
         // require(account != address(0));
 
         ids[msg.sender] = id;
@@ -91,11 +99,11 @@ contract Masternode {
         lastId = id;
         count += 1;
         nodeAddressToId[account] = id;
-        account.transfer(etzMin);
+        make_payable(account).transfer(etzMin);
         emit join(id, msg.sender);
     }
 
-    function() payable public {
+    function() payable external {
         require(msg.value == 0);
         bytes8 id = nodeAddressToId[msg.sender];
         if (id != bytes8(0) && has(id)) {
@@ -131,7 +139,7 @@ contract Masternode {
                      revert(0, 0)
                  }
              }*/
-            address account = address(output[0]);
+            address account = to_address(output[0]);
             nodeAddressToId[account] = bytes8(0);
 
             bytes8 preId = nodes[id].preId;
@@ -165,7 +173,7 @@ contract Masternode {
 
     }
 
-    function getInfo(bytes8 id) constant public returns (
+    function getInfo(bytes8 id) view public returns (
         bytes32 id1,
         bytes32 id2,
         bytes8 preId,
@@ -186,12 +194,12 @@ contract Masternode {
         blockLastPing = nodes[id].blockLastPing;
     }
 
-    function getId(address addr) constant public returns (bytes8 id)
+    function getId(address addr) view public returns (bytes8 id)
     {
         id = ids[addr];
     }
 
-    function has(bytes8 id) constant public returns (bool)
+    function has(bytes8 id) view public returns (bool)
     {
         return nodes[id].id1 != bytes32(0);
     }
@@ -242,7 +250,7 @@ contract Masternode {
         }
     }
 
-    function getVoteInfo(address addr) constant public returns (
+    function getVoteInfo(address addr) view public returns (
         uint voteCount,
         uint startBlock,
         uint stopBlock,
@@ -257,7 +265,7 @@ contract Masternode {
         lastAddress = votes[addr].lastAddress;
     }
 
-    function checkVote(address proposalAddr, address voter) constant public returns (bool)
+    function checkVote(address proposalAddr, address voter) view public returns (bool)
     {
         return voters[proposalAddr][voter];
     }

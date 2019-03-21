@@ -15,7 +15,7 @@ contract('Masternodes', (accounts) => {
             const tx = await web3.eth.sendTransaction({
                 to: masternodeContract.address,
                 from: accounts[0],
-                value: 20000 * 10 ** 18,
+                value: BigInt(20000 * 10 ** 18).toString(10),
                 gasLimit: 270000,
                 data: '0x2f926732d853c35eee71c04a0403586a70c05d4d7866a81a826795cc1c8dff8a32646c72b81c634b04473192aa746a011a34d96cac4651cfc16847f88cee1189fc765877'
             });

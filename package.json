@@ -8,8 +8,8 @@
     "ganache-cli": "node_modules/.bin/ganache-cli"
   },
   "devDependencies": {
-    "ganache-cli": "^6.2.5",
-    "truffle": "4.1.15"
+    "ganache-cli": "^6.4.1",
+    "truffle": "5.0.8"
   },
   "dependencies": {}
 }
