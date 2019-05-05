@@ -120,7 +120,7 @@ contract EmmSharedNodes {
         require(ownerRewards >= volume);
         require(ownedCoins >= volume);
 
-        ownerRewards = safeSub(ownedCoins, volume);
+        ownerRewards = safeSub(ownerRewards, volume);
 
         releaseCoins(volume);
 
