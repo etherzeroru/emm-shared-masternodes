@@ -245,7 +245,7 @@ contract EmmSharedNodes {
             proxy = nodes[nextInactiveNode];
         } else {
             // Creating new contract
-            proxy = new EmmSharedNodeProxy(nodesContract, votingContract);
+            proxy = new EmmSharedNodeProxy(nodesContract, votingContract, owner);
             nodes.push(proxy);
         }
         nextInactiveNode = safeAdd(nextInactiveNode, 1);
@@ -329,20 +329,27 @@ contract EmmSharedNodeProxy {
 
     address payable public nodesContract;
     address public votingContract;
+    address public masterContract;
     address public owner;
     bool public active = false;
 
     // Creating Shared Nodes Proxy contract with Masternode Managing contract address (0x000000000000000000000000000000000000000a)
     // and voting contract address (0x4761977f757e3031350612d55bb891c8144a414b)
-    constructor(address payable _nodeContract, address _votingContract) public {
+    constructor(address payable _nodeContract, address _votingContract, address _owner) public {
         nodesContract = _nodeContract;
         votingContract = _votingContract;
-        owner = msg.sender;
+        masterContract = msg.sender;
+        owner = _owner;
     }
 
     // Only for owner modifier
-    modifier onlyOwner() {
-        require(msg.sender == owner);
+    modifier onlyMaster() {
+        require(msg.sender == masterContract);
+        _;
+    }
+
+    modifier onlyOwnerOrMaster() {
+        require(msg.sender == owner || msg.sender == masterContract);
         _;
     }
 
@@ -351,7 +358,7 @@ contract EmmSharedNodeProxy {
     }
 
     // Register masternode with masternode data (id1, id2) and send MASTERNODE_DEPOSIT to Masternode Managing Contract
-    function register(bytes32 id1, bytes32 id2) payable external onlyOwner {
+    function register(bytes32 id1, bytes32 id2) payable external onlyMaster {
         require(msg.value == MASTERNODE_DEPOSIT);
         require(address(this).balance == MASTERNODE_DEPOSIT);
         (bool success,) = nodesContract.call.value(msg.value)(abi.encodeWithSignature("register(bytes32,bytes32)", id1, id2));
@@ -361,7 +368,7 @@ contract EmmSharedNodeProxy {
     }
 
     // Unregister masternode and send MASTERNODE_DEPOSIT from Masternode Managing Contract to Shared Nodes Managing Contract
-    function unregister() public onlyOwner {
+    function unregister() public onlyMaster {
         require(address(this).balance == 0);
         //nodesContract.transfer(0);
         (bool successWithdraw,) = nodesContract.call(abi.encodeWithSignature("()"));
@@ -375,7 +382,7 @@ contract EmmSharedNodeProxy {
     }
 
     // Vote for proposal (only for owner)
-    function vote(uint index, uint  voteType) public onlyOwner {
+    function vote(uint index, uint  voteType) public onlyOwnerOrMaster {
         (bool success,) = votingContract.call(abi.encodeWithSignature("vote(uint, uint)", index, voteType));
         // require(success); <- illegal voters should be skipped
     }
